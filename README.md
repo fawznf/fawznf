@@ -62,3 +62,19 @@
 ![](https://github-readme-stats.shion.dev/api?username=fawznf&theme=dark&hide_border=false&include_all_commits=false&count_private=false)<br/>
 ![](https://streak-stats.demolab.com/?user=fawznf&theme=dark&hide_border=false)<br/>
 ![](https://github-readme-stats.shion.dev/api/top-langs/?username=fawznf&theme=dark&hide_border=false&include_all_commits=false&count_private=false&layout=compact)
+
+<h2 data-importer="text" align="left">Play games with me</h2>
+
+###
+
+<picture data-importer="pacman">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/fawznf/fawznf/pacman-output/pacman-contribution-graph-dark.svg?game=pacman">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/fawznf/fawznf/pacman-output/pacman-contribution-graph.svg?game=pacman">
+  <img alt="pacman contribution graph" src="https://raw.githubusercontent.com/fawznf/fawznf/pacman-output/pacman-contribution-graph.svg?game=pacman">
+</picture>
+
+###
+
+<img data-importer="snake" src="https://raw.githubusercontent.com/fawznf/fawznf/snake-output/snake.svg" alt="Snake animation" />
+
+###
