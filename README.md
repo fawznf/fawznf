@@ -1,6 +1,6 @@
 ## Hi there I'm Raihan Fawwaz Naufal 👋
 
-![Raihan Fawwaz Naufal](img/fawznf.jpg)
+![Raihan Fawwaz Naufal](img/github-header-banner.png)
 
 <!--
 **fawznf/fawznf** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
