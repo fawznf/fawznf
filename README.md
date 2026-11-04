@@ -1,5 +1,6 @@
-## Hi there 👋
+## Hi there Saya Raihan Fawwaz Naufal 👋
 
+![Raihan Fawwaz Naufal](img/fawznf.jpg)
 <!--
 **fawznf/fawznf** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
 
@@ -14,3 +15,5 @@ Here are some ideas to get you started:
 - 😄 Pronouns: ...
 - ⚡ Fun fact: ...
 -->
+
+- 🔭 I’m currently exploring Data Science, Machine Learning, and AI-driven projects.
