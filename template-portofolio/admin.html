@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rivaldo Jeffmarvin — Admin Management Panel</title>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <!-- CROPPER.JS FOR CROP FOTO MANUAL -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        /* ==========================================
+           1. STYLING UTAMA ADMIN PANEL
+           ========================================== */
+        .admin-nav {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 28px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            padding-bottom: 16px;
+            overflow-x: auto;
+            /* DIBUAT BISA DIGESER LEBAR */
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            /* Sembunyikan scrollbar Firefox */
+        }
+
+        .admin-nav::-webkit-scrollbar {
+            display: none;
+            /* Sembunyikan scrollbar Chrome/Safari */
+        }
+
+        .admin-tab-btn {
+            font-family: var(--font-nav, monospace);
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            padding: 10px 22px;
+            border-radius: var(--radius-hud, 4px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(18, 21, 28, 0.6);
+            backdrop-filter: blur(8px);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            flex-shrink: 0;
+            /* Menjaga ukuran tombol agar tidak gepeng saat digeser */
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+        }
+
+        .admin-tab-btn:hover {
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .admin-tab-btn.active {
+            color: #000000;
+            background: #FFFFFF;
+            border-color: #FFFFFF;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+            font-weight: 800;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .crud-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* ==========================================
+           2. TABEL CRUD & STABILISASI
+           ========================================== */
+        .crud-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(10, 12, 16, 0.8);
+            border-radius: var(--radius-hud, 4px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .crud-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.85rem;
+        }
+
+        .crud-table th {
+            font-family: var(--font-nav, monospace);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: #000000;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 16px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            font-size: 0.75rem;
+        }
+
+        .crud-table td {
+            padding: 14px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-primary, #ffffff);
+            vertical-align: middle;
+        }
+
+        .crud-table tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+        }
+
+        .table-thumb {
+            width: 54px;
+            height: 38px;
+            object-fit: cover;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            background: #000000;
+        }
+
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 0.72rem;
+            letter-spacing: 0.5px;
+            border-radius: 3px;
+        }
+
+        .btn-danger {
+            background: transparent;
+            color: #ff6666;
+            border: 1px solid rgba(255, 102, 102, 0.4);
+        }
+
+        .btn-danger:hover {
+            background: #ff6666;
+            color: #000000;
+            border-color: #ff6666;
+        }
+
+        /* ==========================================
+           3. HAMBURGER MENU & HEADER MOBILE
+           ========================================== */
+        .admin-mobile-menu-btn {
+            display: none;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .admin-header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+        }
+
+        .modal.active {
+            display: flex !important;
+        }
+
+        .modal-content {
+            background: rgba(18, 21, 28, 0.95) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.9);
+            border-radius: 6px;
+        }
+
+        .form-input {
+            background: #000000 !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            color: #ffffff !important;
+            padding: 10px 12px !important;
+            font-size: 0.85rem !important;
+            border-radius: 4px !important;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: #ffffff !important;
+        }
+
+        label {
+            font-family: var(--font-nav, monospace);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .cropper-container-box {
+            max-width: 100%;
+            max-height: 400px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            background: #000;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* ==========================================
+           4. RESPONSIVE MOBILE MEDIA QUERIES
+           ========================================== */
+        @media screen and (max-width: 768px) {
+            .admin-mobile-menu-btn {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .admin-header-actions {
+                display: none;
+                /* Sembunyikan tombol header bawaan di mobile */
+                position: absolute;
+                top: 60px;
+                right: 20px;
+                background: rgba(18, 21, 28, 0.98);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                padding: 14px;
+                border-radius: 6px;
+                flex-direction: column;
+                width: 180px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+                z-index: 1000;
+            }
+
+            .admin-header-actions.show {
+                display: flex !important;
+            }
+
+            .admin-header-actions .btn {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .crud-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .crud-header .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .crud-table {
+                min-width: 600px;
+            }
+
+            .modal-content {
+                width: 92% !important;
+                padding: 20px !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="top-header">
+        <div class="header-container" style="position: relative;">
+            <a href="index.html" class="brand-logo">ADMIN PANEL</a>
+
+            <!-- TOMBOL GARIS 3 (MOBILE) -->
+            <button class="admin-mobile-menu-btn" onclick="toggleAdminNav()">
+                <i data-lucide="menu"></i>
+            </button>
+
+            <!-- DROPDOWN NAV ACTIONS -->
+            <div class="admin-header-actions" id="adminHeaderNav">
+                <a href="index.html" class="btn btn-outline btn-sm">
+                    <i data-lucide="globe" class="btn-icon"></i> Ke Portofolio
+                </a>
+                <button class="btn btn-outline btn-sm" onclick="handleAdminLogout()"
+                    style="color: #ff6666; border-color: rgba(255, 102, 102, 0.5);">
+                    <i data-lucide="log-out" class="btn-icon"></i> Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="main-container">
+        <div class="page-header">
+            <h1 class="page-title">Manajemen Data</h1>
+            <p class="page-subtitle">Pusat kontrol CRUD untuk mengelola item Proyek, Sertifikat, dan Blog.</p>
+        </div>
+
+        <!-- TAB NAVIGATION (GESER / HORIZONTAL SCROLL) -->
+        <div class="admin-nav">
+            <button class="admin-tab-btn active" onclick="switchAdminTab('tab-proyek', this)">
+                <i data-lucide="folder-code"></i> Proyek
+            </button>
+            <button class="admin-tab-btn" onclick="switchAdminTab('tab-sertifikat', this)">
+                <i data-lucide="award"></i> Sertifikat
+            </button>
+            <button class="admin-tab-btn" onclick="switchAdminTab('tab-blog', this)">
+                <i data-lucide="newspaper"></i> Blog
+            </button>
+        </div>
+
+        <!-- TAB 1: PROYEK -->
+        <div id="tab-proyek" class="tab-content active">
+            <div class="hud-panel">
+                <div class="crud-header">
+                    <h2 class="block-title" style="margin-bottom:0;">Data Proyek</h2>
+                    <button class="btn btn-outline btn-sm" onclick="openProyekModal()">
+                        <i data-lucide="plus"></i> Tambah Proyek
+                    </button>
+                </div>
+
+                <div class="crud-table-wrapper">
+                    <table class="crud-table">
+                        <thead>
+                            <tr>
+                                <th>Preview</th>
+                                <th>Judul Proyek</th>
+                                <th>Teknologi (Tags)</th>
+                                <th>URL Preview</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="proyek-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: SERTIFIKAT -->
+        <div id="tab-sertifikat" class="tab-content">
+            <div class="hud-panel">
+                <div class="crud-header">
+                    <h2 class="block-title" style="margin-bottom:0;">Data Sertifikat</h2>
+                    <button class="btn btn-outline btn-sm" onclick="openSertifikatModal()">
+                        <i data-lucide="plus"></i> Tambah Sertifikat
+                    </button>
+                </div>
+
+                <div class="crud-table-wrapper">
+                    <table class="crud-table">
+                        <thead>
+                            <tr>
+                                <th>Gambar Sertifikat</th>
+                                <th>Nama Sertifikat</th>
+                                <th>Penerbit / Instansi</th>
+                                <th>Tahun</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sertifikat-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: BLOG -->
+        <div id="tab-blog" class="tab-content">
+            <div class="hud-panel">
+                <div class="crud-header">
+                    <h2 class="block-title" style="margin-bottom:0;">Kelola Blog</h2>
+                    <button class="btn btn-outline btn-sm" onclick="openBlogModal()">
+                        <i data-lucide="plus"></i> Tambah Blog
+                    </button>
+                </div>
+
+                <div class="crud-table-wrapper">
+                    <table class="crud-table">
+                        <thead>
+                            <tr>
+                                <th>Gambar</th>
+                                <th>Judul</th>
+                                <th>Tanggal</th>
+                                <th>Ringkasan</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminBlogTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL FORM BLOG/DATA -->
+        <div class="modal" id="blogCrudModal" onclick="closeBlogModal()">
+            <div class="modal-content" onclick="event.stopPropagation()"
+                style="max-width: 520px; background: var(--bg-surface); padding: 28px; border: 1px solid var(--border-color);">
+                <h3 id="blogModalTitle" style="margin-bottom: 20px;">Tambah Artikel Blog</h3>
+
+                <input type="hidden" id="blogEditIndex">
+
+                <div style="margin-bottom: 14px;">
+                    <label style="display: block; font-size: 0.75rem; margin-bottom: 6px;">Judul</label>
+                    <input type="text" id="blogJudulInput" class="form-input" placeholder="Judul..."
+                        style="width: 100%;">
+                </div>
+
+                <div style="margin-bottom: 14px;">
+                    <label style="display: block; font-size: 0.75rem; margin-bottom: 6px;">Tanggal / URL</label>
+                    <input type="date" id="blogTanggalInput" class="form-input" style="width: 100%;">
+                </div>
+
+                <div style="margin-bottom: 14px;">
+                    <label style="display: block; font-size: 0.75rem; margin-bottom: 6px;">Gambar (Upload File &
+                        Crop)</label>
+                    <input type="file" id="blogFileInput" accept="image/*" class="form-input"
+                        style="width: 100%; margin-bottom: 8px;" onchange="handleBlogFileSelect(event)">
+                    <input type="text" id="blogGambarInput" class="form-input" placeholder="Atau paste URL gambar..."
+                        style="width: 100%;">
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label style="font-size: 0.75rem;">Ringkasan / Konten</label>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="insertHyperlinkTag()"
+                            style="padding: 2px 10px; font-size: 0.7rem;">+ Add Link</button>
+                    </div>
+                    <textarea id="blogRingkasanInput" class="form-input" rows="5"
+                        placeholder="Tulis konten... (URL seperti https://... akan otomatis di-hyperlink)"
+                        style="width: 100%; resize: vertical;"></textarea>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button class="btn btn-outline" onclick="closeBlogModal()">Batal</button>
+                    <button class="btn btn-white" onclick="saveBlogDataToFirebase()">Simpan ke Firestore</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL CROPPER FOTO MANUAL -->
+        <div class="modal" id="cropperModal" style="z-index: 300;">
+            <div class="modal-content" style="max-width: 600px; padding: 24px;">
+                <h3 style="margin-bottom: 16px;">Potong Foto (Crop Manual)</h3>
+                <div class="cropper-container-box">
+                    <img id="cropperImagePreview" src="" alt="Crop Preview" style="max-width: 100%;">
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button class="btn btn-outline" onclick="cancelCrop()">Batal</button>
+                    <button class="btn btn-white" onclick="applyCrop()">Terapkan & Simpan Crop</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL PREVIEW ZOOM GAMBAR -->
+        <div class="modal" id="imageModal" onclick="closeImageModal()">
+            <div
+                style="max-width: 90vw; max-height: 90vh; display: flex; align-items: center; justify-content: center;">
+                <img id="imageModalImg" src="" alt="Preview Zoom"
+                    style="max-width: 100%; max-height: 85vh; object-fit: contain; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 4px;">
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer" <span>© 2026 Rivaldo Jeffmarvin. Admin System Panel.</span></footer>
+
+    <!-- MANDATORI SCRIPT -->
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/admin.js"></script>
+
+    <script type="module">
+        import { enforceAdminSecurity } from './js/auth.js';
+
+        // Toggle Nav Header Mobile
+        window.toggleAdminNav = function () {
+            const nav = document.getElementById("adminHeaderNav");
+            if (nav) nav.classList.toggle("show");
+        };
+
+        // Jalankan proteksi keamanan secara langsung
+        enforceAdminSecurity();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof window.initIcons === 'function') {
+                window.initIcons();
+            } else if (window.lucide) {
+                lucide.createIcons();
+            }
+        });
+    </script>
+</body>
+
+</html>

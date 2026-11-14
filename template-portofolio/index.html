@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- OPEN GRAPH / SOCIAL MEDIA THUMBNAIL PREVIEW -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rivaldojeffmarvin-74e61.web.app/">
+  <meta property="og:title" content="Rivaldo Jeffmarvin — Informatics Engineer & Freelancer Portfolio">
+  <meta property="og:description"
+    content="Portfolio of Rivaldo Jeffmarvin. Showcasing software development, NLP research, and digital creative works.">
+  <!-- Gambar Thumbnail Preview saat link dibagikan di Social Media -->
+  <meta property="og:image"
+    content="https://api.microlink.io/?url=https://rivaldojeffmarvin-74e61.web.app&screenshot=true&embed=screenshot.url">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- TWITTER / X CARD PREVIEW -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://rivaldojeffmarvin-74e61.web.app/">
+  <meta name="twitter:title" content="Rivaldo Jeffmarvin — Portfolio">
+  <meta name="twitter:description"
+    content="Portfolio of Rivaldo Jeffmarvin. Showcasing software development, NLP research, and digital creative works.">
+  <meta name="twitter:image"
+    content="https://api.microlink.io/?url=https://rivaldojeffmarvin-74e61.web.app&screenshot=true&embed=screenshot.url">
+  <title>Rivaldo Jeffmarvin — Portofolio</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <header class="top-header">
+    <div class="header-container">
+      <a href="index.html" class="brand-logo"><span class="square-icon"></span> RIVALDO JEFFMARVIN</a>
+      <button class="mobile-menu-btn" onclick="toggleMobileMenu()"><i data-lucide="menu"></i></button>
+      <nav class="top-nav" id="topNav">
+        <a href="index.html" class="nav-link"><i data-lucide="layout-dashboard" class="nav-icon"></i>
+          Beranda</a>
+        <a href="proyek.html" class="nav-link"><i data-lucide="folder-code" class="nav-icon"></i> Proyek</a>
+        <a href="sertifikat.html" class="nav-link"><i data-lucide="award" class="nav-icon"></i> Sertifikat</a>
+        <a href="blog.html" class="nav-link"><i data-lucide="newspaper" class="nav-icon"></i> Blog</a>
+        <a href="kontak.html" class="nav-link"><i data-lucide="mail" class="nav-icon"></i> Kontak</a>
+        <a href="tentang.html" class="nav-link"><i data-lucide="user" class="nav-icon"></i> Tentang</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MAIN HUD CONTENT -->
+  <main class="main-container">
+    <div class="game-hud-full">
+
+      <!-- HERO MAIN PANEL -->
+      <div class="hud-panel">
+        <div class="hero-status-tag"><span class="status-dot"></span> STATUS: ONLINE</div>
+        <h1 class="hero-title">Code. Data. Visual. Creativity. Turning ideas into digital experiences.</h1>
+
+      </div>
+
+      <!-- CHARACTER PROFILE PANEL -->
+      <div class="hud-panel char-hud-card">
+        <!-- FOTO PROFIL (PATH SUDAH DISESUAIKAN DENGAN STRUKTUR ASSETS) -->
+        <div class="avatar-hud-box" style="cursor: pointer;" onclick="openImageModal('assets/images/avatar.jfif')">
+          <img src="assets/images/avatar.jfif" alt="Rivaldo Jeffmarvin" class="profile-avatar-img">
+        </div>
+
+        <h3 class="char-name">Rivaldo Jeffmarvin</h3>
+        <p class="char-class">Informatics Student</p>
+
+        <!-- MODAL POPUP PREVIEW FOTO PROFIL -->
+        <div class="modal" id="imageModal" onclick="closeImageModal()">
+          <div style="max-width: 90vw; max-height: 90vh; display: flex; align-items: center; justify-content: center;">
+            <img id="imageModalImg" src="" alt="Foto Profil Zoom"
+              style="max-width: 100%; max-height: 85vh; object-fit: contain; border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 0 40px rgba(0, 0, 0, 0.95);">
+          </div>
+        </div>
+      </div>
+
+      <!-- TECH STACK -->
+      <section class="section-block">
+        <h2 class="block-title">Inventory & Tech Stack</h2>
+        <div class="tech-grid">
+          <div class="tech-card"><i class="devicon-html5-plain"></i><span>HTML5</span></div>
+          <div class="tech-card"><i class="devicon-css3-plain"></i><span>CSS3</span></div>
+          <div class="tech-card"><i class="devicon-javascript-plain"></i><span>JavaScript</span></div>
+          <div class="tech-card"><i class="devicon-python-plain"></i><span>Python</span></div>
+          <div class="tech-card"><i class="devicon-php-plain"></i><span>PHP</span></div>
+          <div class="tech-card"><i class="devicon-flutter-plain"></i><span>Flutter</span></div>
+          <div class="tech-card"><i class="devicon-bootstrap-plain"></i><span>Bootstrap</span></div>
+          <div class="tech-card"><i class="devicon-codeigniter-plain"></i><span>CodeIgniter 4</span></div>
+          <div class="tech-card"><i class="devicon-laravel-plain"></i><span>Laravel</span></div>
+          <div class="tech-card"><i class="devicon-firebase-plain"></i><span>Firebase</span></div>
+          <div class="tech-card"><i class="devicon-mysql-plain"></i><span>MySQL</span></div>
+          <div class="tech-card"><i class="devicon-figma-plain"></i><span>Figma</span></div>
+          <div class="tech-card"><i class="devicon-canva-original"></i><span>Canva</span></div>
+          <!-- CapCut (SVG Custom Vector) -->
+          <div class="tech-card">
+            <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/capcut-icon.svg"
+              alt="CapCut Logo" style="width: 36px; height: 36px; filter: none !important;">
+            <span>CapCut</span>
+          </div>
+          <!-- Adobe After Effects (Devicon / SVG) -->
+          <div class="tech-card"><i class="devicon-aftereffects-plain"></i><span>After Effects</span></div>
+          <div class="tech-card">
+            <img src="https://img.icons8.com/?size=100&id=77638&format=png&color=FFFFFF" alt="CorelDraw Logo"
+              style="width: 36px; height: 36px; filter: none !important;">
+            <span>Corel Draw</span>
+          </div>
+          <div class="tech-card"><i class="devicon-premierepro-plain"></i><span>Premiere Pro</span></div>
+        </div>
+      </section>
+  </main>
+
+  <footer class="site-footer">© 2026 Rivaldo Jeffmarvin. All rights reserved.</footer>
+  <!-- PEMANGGILAN MODUL FIREBASE & SCRIPT -->
+  <script type="module" src="js/firebase-config.js"></script>
+  <script type="module" src="js/script.js"></script>
+</body>
+
+</html>
