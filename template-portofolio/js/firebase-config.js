@@ -3,20 +3,29 @@
 // ==========================================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+// firebaseConfig dari project Firebase "raihan-portofolio-babcf".
 const firebaseConfig = {
-  apiKey: "AIzaSyDA2wJb_LRFuOazrfgmWyzGLAFiiHD3DjQ",
-  authDomain: "rivaldojeffmarvin-74e61.firebaseapp.com",
-  projectId: "rivaldojeffmarvin-74e61",
-  storageBucket: "rivaldojeffmarvin-74e61.firebasestorage.app",
-  messagingSenderId: "659552618026",
-  appId: "1:659552618026:web:034c32f5f31aa0b04a2553",
-  measurementId: "G-E4JGLPYD6X",
+  apiKey: "AIzaSyB3Dn2ZL38L0t80DvBpc_pE-KLJHgr3qkc",
+  authDomain: "raihan-portofolio-babcf.firebaseapp.com",
+  projectId: "raihan-portofolio-babcf",
+  storageBucket: "raihan-portofolio-babcf.firebasestorage.app",
+  messagingSenderId: "995923372827",
+  appId: "1:995923372827:web:896b3da2e0cb9e654001be",
 };
 
-// Inisialisasi Firebase App & Firestore
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+if (String(firebaseConfig.apiKey).startsWith("ISI_")) {
+  console.error(
+    "[Firebase] firebaseConfig di js/firebase-config.js belum diisi. Data dan login belum akan berfungsi.",
+  );
+}
 
-// MANDATORI: Eksport instance Firestore ke Global Window
+// Inisialisasi Firebase App, Firestore & Authentication
+export const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app);
+export const auth = getAuth(app);
+
+// Dipakai oleh script.js dan admin.js
 window.db = db;
+window.auth = auth;

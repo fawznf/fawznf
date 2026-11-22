@@ -1,88 +1,42 @@
 import {
-  getAuth,
+  signInWithEmailAndPassword,
   onAuthStateChanged,
   signOut,
+  setPersistence,
+  browserSessionPersistence,
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { auth } from "./firebase-config.js";
 
 // ==========================================
-// CONFIGURATION & HARDENED CREDENTIALS
+// PENGATURAN PROTEKSI BRUTE-FORCE (SISI BROWSER)
+// Perlindungan utama tetap dari Firebase Auth + Firestore Rules.
 // ==========================================
-var HARDENED_USER_HASH =
-  "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9";
-var HARDENED_PASS_HASH =
-  "2d5004e2b618d25bc2dfcc9a184fb8abe4e8c2d88aadd930acb27e77e69769f4";
-var MAX_FAILED_ATTEMPTS = 3;
-var LOCKOUT_TIME_MS = 5 * 60 * 1000;
+const MAX_FAILED_ATTEMPTS = 3;
+const LOCKOUT_TIME_MS = 5 * 60 * 1000;
 
-// Utility Hash SHA256
-export async function hashSHA256(text) {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(text);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-}
-
-// Cek Sesi Aktif saat membuka Halaman Login
+// Halaman login: jika sudah login, langsung ke dashboard
 export function checkExistingSession() {
-  const sessionToken = sessionStorage.getItem("admin_session_token");
-  const sessionExpiry = sessionStorage.getItem("admin_session_expiry");
-
-  if (sessionToken && sessionExpiry && Date.now() < parseInt(sessionExpiry)) {
-    window.location.replace("admin.html");
-  }
+  onAuthStateChanged(auth, (user) => {
+    if (user) window.location.replace("admin.html");
+  });
 }
 
-// ==========================================
-// FUNGSI PENJAGA KEAMANAN ADMIN PANEL (HYBRID)
-// ==========================================
+// Halaman admin: hanya tampil jika user Firebase sudah login
 export function enforceAdminSecurity() {
-  const sessionToken = sessionStorage.getItem("admin_session_token");
-  const sessionExpiry = sessionStorage.getItem("admin_session_expiry");
-
-  const isSessionValid =
-    sessionToken && sessionExpiry && Date.now() < parseInt(sessionExpiry);
-
-  if (!isSessionValid) {
-    sessionStorage.clear();
-    window.location.replace("login.html");
-    return;
-  }
-
-  // BILA LOGIN VALID: Tampilkan kembali dengan mereset inline style display
-  if (document.body) {
-    document.body.style.display = "";
-  }
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      window.location.replace("login.html");
+      return;
+    }
+    if (document.body) document.body.style.display = "";
+  });
 }
 
-// Validasi 2: Verifikasi dengan Firebase Auth State Listener
-const checkFirebaseReady = setInterval(() => {
-  if (window.auth || getAuth()) {
-    clearInterval(checkFirebaseReady);
-    const auth = getAuth();
-    onAuthStateChanged(auth, (user) => {
-      if (!user && !isSessionValid) {
-        sessionStorage.clear();
-        window.location.replace("login.html");
-      } else {
-        // Lolos dua tingkat pengamanan
-        if (document.body) document.body.style.display = "block";
-      }
-    });
-  }
-}, 50);
-
-// FUNGSI LOGOUT INTEGRATED
+// Logout
 export function handleAdminLogout() {
-  sessionStorage.clear();
-  try {
-    const auth = getAuth();
-    signOut(auth).finally(() => {
-      window.location.replace("login.html");
-    });
-  } catch (err) {
+  signOut(auth).finally(() => {
     window.location.replace("login.html");
-  }
+  });
 }
 
 // UI Alert Helper
@@ -99,12 +53,18 @@ export function showLoginAlert(message, isError = true) {
   alertEl.innerText = message;
 }
 
-// FUNGSI LOGIN DENGAN PROTEKSI BRUTE-FORCE
+function resetSubmitButton(submitBtn) {
+  submitBtn.disabled = false;
+  submitBtn.innerHTML = `<i data-lucide="key-round" style="width: 16px;"></i> Authenticate`;
+  if (typeof window.initIcons === "function") window.initIcons();
+}
+
+// Login dengan Firebase Authentication (Email + Password)
 export async function handleSecureLogin(event) {
   if (event) event.preventDefault();
 
-  const usernameInput = document.getElementById("loginUsername").value.trim();
-  const passwordInput = document.getElementById("loginPassword").value;
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
   const submitBtn = document.getElementById("loginSubmitBtn");
 
   const lockoutUntil = localStorage.getItem("sec_lockout_until");
@@ -113,7 +73,7 @@ export async function handleSecureLogin(event) {
       (parseInt(lockoutUntil) - Date.now()) / 1000,
     );
     showLoginAlert(
-      `AKSES TERKUNCI! Percobaan ilegal terdeteksi. Silakan tunggu ${remainingSeconds} detik lagi.`,
+      `AKSES TERKUNCI! Terlalu banyak percobaan gagal. Silakan tunggu ${remainingSeconds} detik lagi.`,
     );
     return;
   }
@@ -121,56 +81,66 @@ export async function handleSecureLogin(event) {
   submitBtn.disabled = true;
   submitBtn.innerText = "AUTHENTICATING...";
 
-  const inputUserHash = await hashSHA256(usernameInput);
-  const inputPassHash = await hashSHA256(passwordInput);
+  try {
+    // Sesi hanya berlaku selama tab/browser terbuka
+    await setPersistence(auth, browserSessionPersistence);
+    await signInWithEmailAndPassword(auth, email, password);
 
-  if (
-    inputUserHash === HARDENED_USER_HASH &&
-    inputPassHash === HARDENED_PASS_HASH
-  ) {
     localStorage.removeItem("sec_failed_attempts");
     localStorage.removeItem("sec_lockout_until");
 
-    const randomArray = new Uint8Array(24);
-    window.crypto.getRandomValues(randomArray);
-    const sessionToken = Array.from(randomArray, (b) =>
-      b.toString(16).padStart(2, "0"),
-    ).join("");
-    const expiryTime = Date.now() + 2 * 60 * 60 * 1000;
-
-    sessionStorage.setItem("admin_session_token", sessionToken);
-    sessionStorage.setItem("admin_session_expiry", expiryTime);
-
     showLoginAlert("AUTENTIKASI BERHASIL! Mengalihkan ke Dashboard...", false);
-
     setTimeout(() => {
       window.location.replace("admin.html");
     }, 800);
-  } else {
-    let failedAttempts =
-      parseInt(localStorage.getItem("sec_failed_attempts") || "0") + 1;
-    localStorage.setItem("sec_failed_attempts", failedAttempts);
+  } catch (err) {
+    const code = err && err.code ? err.code : "";
 
-    if (failedAttempts >= MAX_FAILED_ATTEMPTS) {
-      const lockUntil = Date.now() + LOCKOUT_TIME_MS;
-      localStorage.setItem("sec_lockout_until", lockUntil);
+    if (
+      code === "auth/invalid-credential" ||
+      code === "auth/wrong-password" ||
+      code === "auth/user-not-found" ||
+      code === "auth/invalid-email"
+    ) {
+      const failedAttempts =
+        parseInt(localStorage.getItem("sec_failed_attempts") || "0") + 1;
+      localStorage.setItem("sec_failed_attempts", failedAttempts);
+
+      if (failedAttempts >= MAX_FAILED_ATTEMPTS) {
+        localStorage.setItem("sec_lockout_until", Date.now() + LOCKOUT_TIME_MS);
+        localStorage.removeItem("sec_failed_attempts");
+        showLoginAlert(
+          "SISTEM DIBLOKIR! 3x salah memasukkan kredensial. Akses dibekukan selama 5 menit.",
+        );
+      } else {
+        showLoginAlert(
+          `EMAIL ATAU PASSWORD SALAH! Sisa percobaan: ${MAX_FAILED_ATTEMPTS - failedAttempts}x lagi sebelum diblokir.`,
+        );
+      }
+    } else if (code === "auth/too-many-requests") {
       showLoginAlert(
-        "SISTEM DIBLOKIR! Anda telah 3x salah memasukkan kredensial. Akses dibekukan selama 5 menit.",
+        "Terlalu banyak percobaan dari Firebase. Tunggu beberapa menit lalu coba lagi.",
+      );
+    } else if (code === "auth/network-request-failed") {
+      showLoginAlert("Gagal terhubung ke server. Periksa koneksi internetmu.");
+    } else if (
+      code === "auth/api-key-not-valid.-please-pass-a-valid-api-key." ||
+      code === "auth/invalid-api-key" ||
+      code === "auth/configuration-not-found"
+    ) {
+      showLoginAlert(
+        "Konfigurasi Firebase belum benar. Periksa js/firebase-config.js dan pastikan Authentication sudah diaktifkan.",
       );
     } else {
-      const sisa = MAX_FAILED_ATTEMPTS - failedAttempts;
-      showLoginAlert(
-        `KREDENSIAL SALAH! Sisa percobaan Anda: ${sisa}x lagi sebelum diblokir.`,
-      );
+      console.error("Login error:", err);
+      showLoginAlert(`Login gagal (${code || "error tidak dikenal"}).`);
     }
 
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = `<i data-lucide="key-round"></i> Authenticate`;
-    if (typeof window.initIcons === "function") window.initIcons();
+    resetSubmitButton(submitBtn);
   }
 }
 
-// BIND FUNGSI KE WINDOW SPASIAL HTML
+// BIND FUNGSI KE WINDOW (dipakai oleh atribut onclick/onsubmit di HTML)
 window.checkExistingSession = checkExistingSession;
 window.enforceAdminSecurity = enforceAdminSecurity;
 window.handleAdminLogout = handleAdminLogout;

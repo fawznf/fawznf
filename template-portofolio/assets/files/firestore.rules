@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Semua pengunjung boleh MEMBACA data portofolio
+    match /{collection}/{docId} {
+      allow read: if collection in ['proyek', 'sertifikat', 'blogs'];
+
+      // Hanya akun admin-mu yang boleh MENULIS (ganti dengan emailmu)
+      allow write: if collection in ['proyek', 'sertifikat', 'blogs']
+                   && request.auth != null
+                   && request.auth.token.email == 'raihanfawzn30@gmail.com';
+    }
+  }
+}
